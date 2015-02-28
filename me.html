@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>Firefly</title>
+
+    <link rel="stylesheet" href="fa/css/bootstrap.min.css">
+    
+    <link rel="stylesheet" href="fa/css/jumbotron.css">
+    <link rel="stylesheet" href="fa/css/styles.css">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+    body  {
+    background-image: url("background-image.png");
+    background-color: #cccccc;
+}
+
+</style>
+  </head>
+
+  <body>
+
+    <div class="container">
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Firefly</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="IP address" class="form-control" id="ipaddress">
+            </div>
+
+            <div class="form-group">
+              <input type="text" placeholder="username" class="form-control" id="username">
+            </div>
+            <button type="submit" class="btn btn-success" onclick="connect()">Run Diagnostic</button>
+          </form>
+        </div><!--/.navbar-collapse -->
+    </nav>
+
+
+  <div class="row">
+    
+        <div class="timeline-centered">
+
+        <article class="timeline-entry">
+          <div class="timeline-entry-inner">
+              <div class="timeline-icon bg-success">1
+              </div>
+              <div class="timeline-label">
+                    <h3>Wand</h3>
+                    <h4 id="wand" style="display:none;">...connected</h4>
+              </div>
+            </div>
+        </article>
+        <article class="timeline-entry">
+          <div class="timeline-entry-inner">
+              <div class="timeline-icon bg-success">2
+              </div>
+              <div class="timeline-label">
+                    <h3>Hub</h3>
+                    <h4 id="hub" style="display:none;">...connected</h4>
+              </div>
+            </div>
+        </article>
+        <article class="timeline-entry">
+          <div class="timeline-entry-inner">
+              <div class="timeline-icon bg-success">3
+              </div>
+              <div class="timeline-label">
+                    <h3>Lights</h3>
+                    <h4 id="lights" style="display:none;">...connected</h4>
+              </div>
+            </div>
+        </article>
+        <article class="timeline-entry">
+          <div class="timeline-entry-inner">
+              <div class="timeline-icon bg-success">4
+              </div>
+              <div class="timeline-label" id="color">
+                    <h3>Light status</h3>
+              </div>
+            </div>
+        </article>
+        
+    </div>
+
+      <footer class="footer">
+        <p>Jay and Pam</p>
+      </footer>
+
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+    <script>
+
+
+
+  function connect() {
+
+
+    url = "http://" + '192.168.1.125' + '/api/' + username.value + '/lights/';
+    httpGet( url, getLights);
+
+    changestate("wand")
+    changestate("hub");
+    changestate("lights");
+    changecolor("color","RGB(0, 112, 192)");
+  }
+
+function httpGet(theUrl)
+{
+    var xmlHttp = null;
+
+    xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+  function getLights(result){
+
+    console.log(result);
+  }
+
+  function changestate(component)
+    {
+        (function(style) {
+            style.display = style.display === 'none' ? '' : 'none';
+        })(document.getElementById(component).style);
+        console.log(component);
+    }
+    function changecolor(component, color)
+    {
+        document.getElementById(component).style.backgroundColor = color;
+
+
+        setLight();
+
+
+        console.log(component);
+    }
+
+    function setLight() {
+      lightNumber = 1;
+              var JsonString = '{\"'+'hue\"'+':2587}';
+        var payload = JSON.parse(JsonString);     // convert string to JSON object
+    var path = url + lightNumber + '/state';    // assemble the full URL
+    console.log(payload);
+    var content = JSON.stringify(payload);       // convert JSON obj to string
+    console.log(content);
+      
+    var request = $.ajax({
+      type: "PUT",          // use the PUT method
+      url: path,            // URL to call
+      data: content,          // body of the request
+      dataType: 'text/json'   // data type of the body
+      }, function(response) {   // callback function
+        println(response);    // server (hub) response
+        getLights();        // refresh the lights from the hub
+      });
+  }
+    </script>
+  </body>
+</html>

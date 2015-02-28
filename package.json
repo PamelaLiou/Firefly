@@ -1,0 +1,15 @@
+{
+  "name": "node-hue-api-examples",
+  "version": "0.0.1",
+  "author": "Jay and Pam",
+  "dependencies": {
+    "node-hue-api": ">=1.0.3",
+    "express":"*",
+    "serialport":"*",
+    "ws":"*"
+  },
+  "main": "index.js",
+  "engines": {
+    "nodejs": ">= 0.10.0"
+  }
+}
